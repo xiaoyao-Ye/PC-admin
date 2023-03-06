@@ -304,6 +304,20 @@
 					}
 				},
 				{
+					"path": "/assembly/excel",
+					"name": "excel",
+					"component": "/assembly/excel/index",
+					"meta": {
+						"icon": "Menu",
+						"title": "上传 excel",
+						"isLink": "",
+						"isHide": false,
+						"isFull": false,
+						"isAffix": false,
+						"isKeepAlive": true
+					}
+				},
+				{
 					"path": "/assembly/batchImport",
 					"name": "batchImport",
 					"component": "/assembly/batchImport/index",
