@@ -43,7 +43,11 @@ const getAuthButtonsList = async () => {
 
 // 获取菜单列表中
 const getMenuList = async () => {
-	const { data } = await getAuthMenu();
+	// const { data } = await getAuthMenu();
+	// TODO: 临时添加 excel 路由
+	const { data = [] } = await getAuthMenu();
+	data.push({ icon: "excel", title: "excel", path: "/excel" });
+	console.log({ data });
 	// 把路由菜单处理成一维数组（存储到 pinia ）
 	data && authStore.setAuthRouter(handleRouter(data));
 	data && menuStore.setMenuList(data);
