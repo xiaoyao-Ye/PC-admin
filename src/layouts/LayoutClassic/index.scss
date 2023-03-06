@@ -1,13 +1,3 @@
-.layout-classic {
-	min-width: 1030px;
-	.classic-bottom {
-		height: calc(100% - 55px);
-		.classic-bottom-right {
-			display: flex;
-			flex-direction: column;
-		}
-	}
-}
 .el-container {
 	width: 100%;
 	height: 100%;
@@ -19,23 +9,26 @@
 		height: 55px;
 		padding: 0 15px 0 0;
 		background-color: #191a20;
-		border-bottom: 1px solid #f6f6f6;
+		border-bottom: 1px solid #f1f1f1;
 		.header-lf {
 			display: flex;
 			align-items: center;
+			overflow: hidden;
+			white-space: nowrap;
 			.logo {
-				width: 220px;
+				flex-shrink: 0;
+				width: 210px;
 				margin-right: 16px;
 				span {
-					font-size: 22px;
+					font-size: 21.5px;
 					font-weight: bold;
 					color: #dadada;
 					white-space: nowrap;
 				}
 				img {
-					width: 30px;
+					width: 28px;
 					object-fit: contain;
-					margin-right: 8px;
+					margin-right: 6px;
 				}
 			}
 		}

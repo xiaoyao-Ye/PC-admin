@@ -1,5 +1,5 @@
 <template>
-	<el-dropdown trigger="click">
+	<el-dropdown trigger="click" :teleported="false">
 		<el-button size="small" type="primary">
 			<span>{{ $t("tabs.more") }}</span>
 			<el-icon class="el-icon--right"><arrow-down /></el-icon>
@@ -9,14 +9,17 @@
 				<el-dropdown-item @click="refresh">
 					<el-icon><Refresh /></el-icon>{{ $t("tabs.refresh") }}
 				</el-dropdown-item>
-				<el-dropdown-item @click="closeCurrentTab">
+				<el-dropdown-item @click="maximize">
+					<el-icon><FullScreen /></el-icon>{{ $t("tabs.maximize") }}
+				</el-dropdown-item>
+				<el-dropdown-item divided @click="closeCurrentTab">
 					<el-icon><Remove /></el-icon>{{ $t("tabs.closeCurrent") }}
 				</el-dropdown-item>
 				<el-dropdown-item @click="closeOtherTab">
 					<el-icon><CircleClose /></el-icon>{{ $t("tabs.closeOther") }}
 				</el-dropdown-item>
 				<el-dropdown-item @click="closeAllTab">
-					<el-icon><Delete /></el-icon>{{ $t("tabs.closeAll") }}
+					<el-icon><FolderDelete /></el-icon>{{ $t("tabs.closeAll") }}
 				</el-dropdown-item>
 			</el-dropdown-menu>
 		</template>
@@ -24,35 +27,56 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { TabsStore } from "@/store/modules/tabs";
+import { computed, inject, nextTick } from "vue";
 import { HOME_URL } from "@/config/config";
-import { ElMessage } from "element-plus";
+import { GlobalStore } from "@/stores";
+import { TabsStore } from "@/stores/modules/tabs";
+import { KeepAliveStore } from "@/stores/modules/keepAlive";
+import { useRoute, useRouter } from "vue-router";
 
+const route = useRoute();
+const router = useRouter();
 const tabStore = TabsStore();
-const reload: Function = inject("refresh") as Function;
+const globalStore = GlobalStore();
+const keepAliveStore = KeepAliveStore();
+const themeConfig = computed(() => globalStore.themeConfig);
 
+const refreshCurrentPage: Function = inject("refresh") as Function;
 // refresh current page
 const refresh = () => {
-	ElMessage({ type: "success", message: "刷新当前页面 🚀" });
-	reload();
+	setTimeout(() => {
+		keepAliveStore.removeKeepAliveName(route.name as string);
+		refreshCurrentPage(false);
+		nextTick(() => {
+			keepAliveStore.addKeepAliveName(route.name as string);
+			refreshCurrentPage(true);
+		});
+	}, 0);
+};
+
+// maximize current page
+const maximize = () => {
+	globalStore.setThemeConfig({ ...themeConfig.value, maximize: true });
 };
 
 // Close Current
 const closeCurrentTab = () => {
-	if (tabStore.tabsMenuValue === HOME_URL) return;
-	tabStore.removeTabs(tabStore.tabsMenuValue);
+	if (route.meta.isAffix) return;
+	tabStore.removeTabs(route.fullPath);
+	keepAliveStore.removeKeepAliveName(route.name as string);
 };
 
 // Close Other
 const closeOtherTab = () => {
-	tabStore.closeMultipleTab(tabStore.tabsMenuValue);
+	tabStore.closeMultipleTab(route.fullPath);
+	keepAliveStore.setKeepAliveName([route.name] as string[]);
 };
 
 // Close All
 const closeAllTab = () => {
 	tabStore.closeMultipleTab();
-	tabStore.goHome();
+	keepAliveStore.setKeepAliveName();
+	router.push(HOME_URL);
 };
 </script>
 

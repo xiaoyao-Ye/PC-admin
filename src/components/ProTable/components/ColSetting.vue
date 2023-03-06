@@ -1,16 +1,19 @@
 <template>
-	<!-- 列显隐设置 -->
-	<el-drawer title="列设置" v-model="drawerVisible" size="400px">
-		<div class="table">
-			<el-table :data="colSetting" :border="true">
+	<!-- 列设置 -->
+	<el-drawer title="列设置" v-model="drawerVisible" size="450px">
+		<div class="table-main">
+			<el-table :data="colSetting" :border="true" row-key="prop" default-expand-all :tree-props="{ children: '_children' }">
 				<el-table-column prop="label" align="center" label="列名" />
-				<el-table-column prop="name" align="center" label="显示" v-slot="scope">
-					<el-switch v-model="scope.row.isShow" @click="switchShow"></el-switch>
+				<el-table-column prop="isShow" align="center" label="显示" v-slot="scope">
+					<el-switch v-model="scope.row.isShow"></el-switch>
+				</el-table-column>
+				<el-table-column prop="sortable" align="center" label="排序" v-slot="scope">
+					<el-switch v-model="scope.row.sortable"></el-switch>
 				</el-table-column>
 				<template #empty>
 					<div class="table-empty">
 						<img src="@/assets/images/notData.png" alt="notData" />
-						<div>暂无数据</div>
+						<div>暂无可配置列</div>
 					</div>
 				</template>
 			</el-table>
@@ -18,27 +21,25 @@
 	</el-drawer>
 </template>
 
-<script setup lang="ts" name="colSetting">
-import { ref, nextTick } from "vue";
+<script setup lang="ts" name="ColSetting">
+import { ref } from "vue";
 import { ColumnProps } from "@/components/ProTable/interface";
 
-const props = defineProps<{ colSetting: Partial<ColumnProps>[]; tableRef: any }>();
+defineProps<{ colSetting: ColumnProps[] }>();
 
 const drawerVisible = ref<boolean>(false);
 // 打开列设置
-const openColSetting = (): void => {
+const openColSetting = () => {
 	drawerVisible.value = true;
-};
-
-// 列显隐时重新布局 table（防止表格抖动,隐藏显示之后会出现横向滚动条,element-plus 内部问题，已经提了 issues）不使用 doLayout 就不会出现滚动条
-const switchShow = () => {
-	nextTick(() => {
-		console.log(props);
-		// props.tableRef.doLayout();
-	});
 };
 
 defineExpose({
 	openColSetting
 });
 </script>
+
+<style scoped lang="scss">
+.cursor-move {
+	cursor: move;
+}
+</style>

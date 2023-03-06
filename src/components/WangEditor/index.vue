@@ -13,7 +13,7 @@
 	</div>
 </template>
 
-<script setup lang="ts" name="wangEditor">
+<script setup lang="ts" name="WangEditor">
 import { nextTick, computed, shallowRef, onBeforeUnmount } from "vue";
 import { IToolbarConfig, IEditorConfig } from "@wangeditor/editor";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
@@ -89,7 +89,7 @@ props.editorConfig.MENU_CONF!["uploadImage"] = {
 		formData.append("file", file);
 		try {
 			const { data } = await uploadImg(formData);
-			insertFn(data!.fileUrl);
+			insertFn(data.fileUrl);
 		} catch (error) {
 			console.log(error);
 		}
@@ -115,7 +115,7 @@ props.editorConfig.MENU_CONF!["uploadVideo"] = {
 		formData.append("file", file);
 		try {
 			const { data } = await uploadVideo(formData);
-			insertFn(data!.fileUrl);
+			insertFn(data.fileUrl);
 		} catch (error) {
 			console.log(error);
 		}

@@ -25,13 +25,17 @@ import directives from "@/directives/index";
 // vue Router
 import router from "@/routers/index";
 // vue i18n
-import I18n from "@/language/index";
+import I18n from "@/languages/index";
 // pinia store
-import pinia from "@/store/index";
+import pinia from "@/stores/index";
 // svg icons
 import "virtual:svg-icons-register";
+// errorHandler
+import errorHandler from "@/utils/errorHandler";
 
 const app = createApp(App);
+
+app.config.errorHandler = errorHandler;
 
 // 注册element Icons组件
 Object.keys(Icons).forEach(key => {

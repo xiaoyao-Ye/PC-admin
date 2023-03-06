@@ -25,11 +25,13 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { GlobalStore } from "@/stores";
+import { LOGIN_URL } from "@/config/config";
+import { logoutApi } from "@/api/modules/login";
+import { useRouter } from "vue-router";
+import { ElMessageBox, ElMessage } from "element-plus";
 import InfoDialog from "./InfoDialog.vue";
 import PasswordDialog from "./PasswordDialog.vue";
-import { ElMessageBox, ElMessage } from "element-plus";
-import { useRouter } from "vue-router";
-import { GlobalStore } from "@/store";
 
 const router = useRouter();
 const globalStore = GlobalStore();
@@ -40,13 +42,14 @@ const logout = () => {
 		confirmButtonText: "确定",
 		cancelButtonText: "取消",
 		type: "warning"
-	}).then(() => {
-		router.push({ name: "login" });
+	}).then(async () => {
+		// 1.调用退出登录接口
+		await logoutApi();
+		// 2.清除 Token
 		globalStore.setToken("");
-		ElMessage({
-			type: "success",
-			message: "退出登录成功！"
-		});
+		// 3.重定向到登陆页
+		router.replace(LOGIN_URL);
+		ElMessage.success("退出登录成功！");
 	});
 };
 
@@ -57,8 +60,8 @@ const infoRef = ref<null | DialogExpose>(null);
 const passwordRef = ref<null | DialogExpose>(null);
 // 打开修改密码和个人信息弹窗
 const openDialog = (refName: string) => {
-	if (refName == "infoRef") return infoRef.value?.openDialog();
-	passwordRef.value?.openDialog();
+	if (refName == "infoRef") infoRef.value?.openDialog();
+	else passwordRef.value?.openDialog();
 };
 </script>
 
