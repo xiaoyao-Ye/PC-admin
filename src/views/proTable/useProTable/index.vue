@@ -35,12 +35,13 @@
         </el-button>
       </template>
       <!-- 表格操作 -->
-      <template #operation="scope">
+      <!-- operation 插槽优先级比配置项高, 配置项不满足业务需求时, 可以使用插槽 -->
+      <!-- <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)"> 查看 </el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)"> 编辑 </el-button>
         <el-button type="primary" link :icon="Refresh" @click="resetPass(scope.row)"> 重置密码 </el-button>
         <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)"> 删除 </el-button>
-      </template>
+      </template> -->
     </ProTable>
     <UserDrawer ref="drawerRef" />
     <ImportExcel ref="dialogRef" />
@@ -48,7 +49,7 @@
 </template>
 
 <script setup lang="tsx" name="useProTable">
-import { ref, reactive } from "vue";
+import { ref, reactive, markRaw } from "vue";
 import { useRouter } from "vue-router";
 import { User } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
@@ -204,7 +205,20 @@ const columns: ColumnProps<User.ResUserList>[] = [
       defaultValue: ["2022-11-12 11:35:00", "2022-12-12 11:35:00"]
     }
   },
-  { prop: "operation", label: "操作", fixed: "right", width: 330 }
+  // { prop: "operation", label: "操作", fixed: "right", width: 330 },
+  {
+    type: "operation",
+    label: "操作",
+    fixed: "right",
+    width: 330,
+    buttonGroup: [
+      // 使用 markRaw() 方法, 是为了解决 vue 的警告
+      { label: "查看", onClick: scope => openDrawer("查看", scope.row), props: { icon: markRaw(View) } },
+      { label: "编辑", onClick: scope => openDrawer("编辑", scope.row), props: { icon: markRaw(EditPen) } },
+      { label: "重置密码", onClick: scope => resetPass(scope.row), props: { icon: markRaw(Refresh) } },
+      { label: "删除", onClick: scope => deleteAccount(scope.row), props: { icon: markRaw(Delete) } }
+    ]
+  }
 ];
 
 // 删除用户信息

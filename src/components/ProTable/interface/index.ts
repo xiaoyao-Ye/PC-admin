@@ -66,6 +66,18 @@ export type HeaderRenderScope<T> = {
   [key: string]: any;
 };
 
+export type ButtonGroup<T = any> = {
+  /**
+   * 按钮参数, 根据 element plus 官方文档来传递，该属性所有值会透传到组件
+   * 如果传递的属性值是一个组件(比如 icon: View)需要使用 markRow 方法进行包裹(icon: markRow(View))避免 vue 警告
+   */
+  props?: any;
+  label: string; // 按钮名称
+  isShow?: boolean | ((scope: RenderScope<T>) => boolean); // 是否显示
+  onClick?: (scope: RenderScope<T>) => void;
+  render?: (scope: RenderScope<T>) => VNode | string; // 自定义单元格内容渲染（tsx语法）
+};
+
 export interface ColumnProps<T = any> extends Partial<Omit<TableColumnCtx<T>, "children" | "renderCell" | "renderHeader">> {
   tag?: boolean; // 是否是标签展示
   isShow?: boolean; // 是否显示在表格当中
@@ -75,6 +87,7 @@ export interface ColumnProps<T = any> extends Partial<Omit<TableColumnCtx<T>, "c
   fieldNames?: FieldNamesProps; // 指定 label && value && children 的 key 值
   headerRender?: (scope: HeaderRenderScope<T>) => VNode; // 自定义表头内容渲染（tsx语法）
   render?: (scope: RenderScope<T>) => VNode | string; // 自定义单元格内容渲染（tsx语法）
+  buttonGroup?: ButtonGroup<T>[]; // 当 ColumnProps 的其中一个对象配置 type: "operation" 时，可以通过 buttonGroup 属性指定按钮组
   _children?: ColumnProps<T>[]; // 多级表头
 }
 

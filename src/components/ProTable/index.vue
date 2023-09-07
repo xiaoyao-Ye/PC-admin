@@ -47,8 +47,28 @@
           :reserve-selection="item.type == 'selection'"
         >
           <template v-if="item.type == 'expand'" #default="scope">
-            <component :is="item.render" v-bind="scope" v-if="item.render"> </component>
+            <component v-if="item.render" :is="item.render" v-bind="scope"> </component>
             <slot v-else :name="item.type" v-bind="scope"></slot>
+          </template>
+        </el-table-column>
+        <!-- 操作列 -->
+        <el-table-column v-if="item.type === 'operation'" align="center" v-bind="item">
+          <template #default="scope">
+            <component v-if="item.render" :is="item.render" v-bind="scope"> </component>
+            <slot v-else :name="item.type" v-bind="scope">
+              <template v-for="btn in item.buttonGroup" :key="btn.label">
+                <component v-if="btn.render" :is="btn.render" v-bind="btn.props"> </component>
+                <el-button
+                  v-if="!btn.isShow || (isBoolean(btn.isShow) && btn.isShow) || (isFunction(btn.isShow) && btn.isShow(scope))"
+                  type="primary"
+                  link
+                  @click="() => btn.onClick && btn.onClick(scope)"
+                  v-bind="btn.props"
+                >
+                  {{ btn.label }}
+                </el-button>
+              </template>
+            </slot>
           </template>
         </el-table-column>
         <!-- other -->
@@ -95,6 +115,7 @@ import { BreakPoint } from "@/components/Grid/interface";
 import { ColumnProps } from "@/components/ProTable/interface";
 import { Refresh, Printer, Operation, Search } from "@element-plus/icons-vue";
 import { filterEnum, formatValue, handleProp, handleRowAccordingToProp } from "@/utils";
+import { isBoolean, isFunction } from "@/utils/is";
 import SearchForm from "@/components/SearchForm/index.vue";
 import Pagination from "./components/Pagination.vue";
 import ColSetting from "./components/ColSetting.vue";
@@ -202,9 +223,7 @@ searchColumns.sort((a, b) => a.search!.order! - b.search!.order!);
 
 // 列设置 ==> 过滤掉不需要设置的列
 const colRef = ref();
-const colSetting = tableColumns.value!.filter(
-  item => !["selection", "index", "expand"].includes(item.type!) && item.prop !== "operation" && item.isShow
-);
+const colSetting = tableColumns.value!.filter(item => !["selection", "index", "expand"].includes(item.type!) && item.isShow);
 const openColSetting = () => colRef.value.openColSetting();
 
 // 🙅‍♀️ 不需要打印可以把以下方法删除，打印功能目前存在很多 bug
@@ -239,7 +258,7 @@ const print = () => {
     printable: printData.value,
     header: props.title && header,
     properties: flatColumns
-      .value!.filter(item => !["selection", "index", "expand"].includes(item.type!) && item.isShow && item.prop !== "operation")
+      .value!.filter(item => !["selection", "index", "expand"].includes(item.type!) && item.isShow)
       .map((item: ColumnProps) => ({ field: handleProp(item.prop!), displayName: item.label })),
     type: "json",
     gridHeaderStyle,
